@@ -3,6 +3,7 @@ pkgname=cargo
 version=0.11.0
 revision=2
 _githash_installer=c37d3747da75c280237dc2d6b925078e69555499
+patch_args="-Np1"
 build_style=gnu-configure
 make_build_args="VERBOSE=1"
 hostmakedepends="rust python curl cmake pkg-config"
@@ -13,20 +14,25 @@ maintainer="Christian Neukirchen <chneukirchen@gmail.com>"
 license="MIT, Apache-2.0"
 homepage="https://crates.io/"
 distfiles="https://github.com/rust-lang/${pkgname}/archive/${version}.tar.gz
- https://github.com/rust-lang/rust-installer/archive/${_githash_installer}.tar.gz"
+ https://github.com/rust-lang/rust-installer/archive/${_githash_installer}.tar.gz
+ https://alpine.geeknet.cz/distfiles/cargo-0.11.0-nightly-x86_64-alpine-linux-musl.tar.gz"
 checksum="4f390d7ea3352a1ecafb53d1a2b98c2e195b81a5c652342a8b91672d9f1dde0a
- 6326434c225d25c6bfd28ff8bbc3108e331ae65e89a5c38dac8a2c8ffa09732b"
+ 6326434c225d25c6bfd28ff8bbc3108e331ae65e89a5c38dac8a2c8ffa09732b
+ 587172026c0565e839d96b0c1d4c68c000927817398241f96682dca47fa8c3b9"
 nocross=yes
 
 post_extract() {
 	rm -rf src/rust-installer
 	mv ../rust-installer-${_githash_installer} src/rust-installer
 	sed -i 's,/etc/bash_completion.d,/share/bash-completion/completions,g' Makefile.in
+	mkdir -p target/snapshot
+	mv ../cargo-nightly*/cargo/* target/snapshot
 }
 pre_configure() {
 	configure_args+=" --host=${XBPS_TRIPLET/-pc-/-unknown-} --build=${XBPS_TRIPLET/-pc-/-unknown-}"
 	sed -i '/not recognized/s/err/warn/' configure
 	export LIBGIT2_SYS_USE_PKG_CONFIG=yes
+	export CARGO_HOME="${wrksrc}/.cargo"
 }
 post_install() {
 	rm -rf ${DESTDIR}/usr/lib/rustlib ${DESTDIR}/usr/share/doc/cargo
