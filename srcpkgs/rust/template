@@ -7,34 +7,47 @@ lib32disabled=yes
 patch_args="-Np1"
 build_style=configure
 make_build_args="dist VERBOSE=1"
-# XXX musl support still incomplete
 only_for_archs="x86_64 x86_64-musl"
-hostmakedepends="pkg-config curl python cmake"
+hostmakedepends="cmake curl pkg-config python"
 makedepends="libffi-devel lld-devel llvm ncurses-devel zlib-devel"
 short_desc="Safe, concurrent, practical systems language"
 maintainer="Juan RP <xtraeme@voidlinux.eu>"
 homepage="http://www.rust-lang.org/"
 license="MIT, Apache-2.0"
-distfiles="https://static.rust-lang.org/dist/rustc-${version}-src.tar.gz
- https://alpine.geeknet.cz/distfiles/rustc-${version}-x86_64-unknown-linux-musl.tar.gz
- https://alpine.geeknet.cz/distfiles/rust-std-${version}-x86_64-unknown-linux-musl.tar.gz
- https://alpine.geeknet.cz/distfiles/cargo-0.11.0-nightly-x86_64-alpine-linux-musl.tar.gz"
-checksum="a4015aacf4f6d8a8239253c4da46e7abaa8584f8214d1828d2ff0a8f56176869
- a7d8baacfa2225c923de28ecef2c9550c1d82cef3b90f6a1b8431359da7e7e69
- 335527615fc1a5f53d41c1d8556645bfe0b4f3a39f72ad859b392392066d9239
- 587172026c0565e839d96b0c1d4c68c000927817398241f96682dca47fa8c3b9"
+distfiles="https://static.rust-lang.org/dist/rustc-${version}-src.tar.gz"
+checksum="a4015aacf4f6d8a8239253c4da46e7abaa8584f8214d1828d2ff0a8f56176869"
+
+case "$XBPS_MACHINE" in
+x86_64-musl)
+	distfiles+="
+	 https://alpine.geeknet.cz/distfiles/rustc-${version}-x86_64-unknown-linux-musl.tar.gz
+	 https://alpine.geeknet.cz/distfiles/rust-std-${version}-x86_64-unknown-linux-musl.tar.gz
+	 https://alpine.geeknet.cz/distfiles/cargo-0.11.0-nightly-x86_64-alpine-linux-musl.tar.gz"
+	checksum+="
+	 a7d8baacfa2225c923de28ecef2c9550c1d82cef3b90f6a1b8431359da7e7e69
+	 335527615fc1a5f53d41c1d8556645bfe0b4f3a39f72ad859b392392066d9239
+	 587172026c0565e839d96b0c1d4c68c000927817398241f96682dca47fa8c3b9"
+	;;
+x86_64)
+	distfiles+="
+	 https://static.rust-lang.org/dist/2016-05-24/rustc-1.9.0-x86_64-unknown-linux-gnu.tar.gz
+	 https://static.rust-lang.org/dist/2016-05-24/rust-std-1.9.0-x86_64-unknown-linux-gnu.tar.gz
+	 https://static.rust-lang.org/cargo-dist/2016-04-10/cargo-nightly-x86_64-unknown-linux-gnu.tar.gz"
+	checksum+="
+	 d0704d10237c66c3efafa6f7e5570c59a1d3fe5c6d99487540f90ebb37cd84c4
+	 82db31ce846d2ed986b10bf7859e207a5e7f3d78b0e333bb4b1d6795af4ec44b
+	 721a2bfb1f2ffff09b59911ba686a3a55eac6a2df88f19168be0a7c8a1fdffca"
+	;;
+esac
 
 post_extract() {
-	rm -rf src/llvm src/jemalloc
+	rm -rf src/llvm
 
 	mkdir -p stage0
 	cp -flr ../rustc-*/rustc/* stage0
 	cp -flr ../rust-std-*/rust-std-*/* stage0
 	cp -flr ../cargo-*/cargo/* stage0
-}
-pre_build() {
-	export CARGO_HOME="$wrksrc/.cargo"
-	
+
 	# XXX: Cheat Rust build system so we can build rustc using different
 	# version of (prebuilt) stable rustc than preconfigured. It's hack-ish,
 	# but since we're basically rebuilding rustc with the same version,
@@ -56,6 +69,10 @@ rustc = "$wrksrc/stage0/bin/rustc"
 EOF
 }
 
+pre_build() {
+	export CARGO_HOME="$wrksrc/.cargo"
+}
+
 do_configure() {
 	local _triplet
 	case $XBPS_TARGET_MACHINE in
@@ -64,7 +81,24 @@ do_configure() {
 		x86_64-musl) _triplet=x86_64-unknown-linux-musl;;
 		*) _triplet=$XBPS_TARGET_MACHINE;;
 	esac
-	./configure --prefix=/usr --disable-docs --enable-ccache --host=${_triplet} --build=${_triplet} --release-channel=stable --enable-rustbuild --musl-root=/usr --llvm-root=/usr --disable-jemalloc --disable-rpath
+	configure_args="
+		--prefix=/usr 
+		--host=${_triplet} 
+		--build=${_triplet} 
+		--release-channel=stable 
+		--disable-docs 
+		--disable-rpath
+		--enable-ccache 
+		--enable-rustbuild 
+		--llvm-root=/usr 
+	"
+	case "$XBPS_TARGET_MACHINE" in
+        *-musl) 
+		configure_args+="--musl-root=/usr --disable-jemalloc"
+		;;
+	esac
+	./configure $configure_args
+ 
 }
 do_install() {
 	vmkdir usr
