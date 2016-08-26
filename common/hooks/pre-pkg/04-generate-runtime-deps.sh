@@ -85,6 +85,11 @@ hook() {
                     fi
                     unset found_dup
                 done
+                for vers in $($OBJDUMP -p "$f" |
+                    awk '/^Version References/,/^$/{if($2=="0x00")print $4}'); do
+                            echo "   VERSION: $vers"
+                            sorequires+="${vers} "
+                done
                 ;;
         esac
     done
