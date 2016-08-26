@@ -92,7 +92,7 @@ hook() {
 					break
 				fi
 			done;
-			if [ -z "$found" ]; then
+			if [ -z "$found" ] && [[ "$libname" =~ \.so ]]; then
 				_myshlib="${libname}.so"
 				[ "${_myshlib}" != "${rev}" ] && _myshlib+=".${rev}"
 				msg_warn "${pkgver}: ${_myshlib} not found in common/shlibs!\n"

@@ -28,6 +28,12 @@ collect_sonames() {
 				echo "${_soname}" >> ${_tmpfile}
 				echo "   SONAME ${_soname} from ${f##${_destdir}}"
 			fi
+
+			# versioned symbols
+			${OBJDUMP} -p "$f" | awk '/^Version definitions/,/^$/{if($2=="0x00")print $4}' | while read _vers; do
+				echo "${_vers}" >> ${_tmpfile}
+				echo "   VERSION ${_vers} from ${f##${_destdir}}"
+			done
 			;;
 		esac
 	done
