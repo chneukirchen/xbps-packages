@@ -10,8 +10,8 @@ _sysroot="/usr/${_triplet}"
 _archflags="-march=i686"
 
 pkgname=cross-${_triplet}
-version=0.23
-revision=2
+version=0.24
+revision=1
 short_desc="Cross toolchain for i686 target (musl)"
 maintainer="Juan RP <xtraeme@voidlinux.eu>"
 homepage="http://www.voidlinux.eu"
@@ -165,6 +165,8 @@ _gcc_build() {
 	_args+=" --prefix=/usr"
 	_args+=" --enable-languages=c,c++,fortran,lto"
 	_args+=" --enable-lto"
+	_args+=" --enable-default-pie"
+	_args+=" --enable-default-ssp"
 	_args+=" --disable-libsanitizer"
 	_args+=" --disable-multilib"
 	_args+=" --disable-libmpx"
