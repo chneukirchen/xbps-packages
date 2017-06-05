@@ -9,8 +9,8 @@ _triplet=x86_64-linux-musl
 _sysroot="/usr/${_triplet}"
 
 pkgname=cross-${_triplet}
-version=0.23
-revision=2
+version=0.24
+revision=1
 short_desc="Cross toolchain for x86_64 with musl"
 maintainer="Juan RP <xtraeme@voidlinux.eu>"
 homepage="http://www.voidlinux.eu"
@@ -167,6 +167,8 @@ _gcc_build() {
 	_args+=" --with-sysroot=${_sysroot}"
 	_args+=" --enable-languages=c,c++,fortran,lto"
 	_args+=" --enable-lto"
+	_args+=" --enable-default-pie"
+	_args+=" --enable-default-ssp"
 	_args+=" --enable-libquadmath"
 	_args+=" --disable-libsanitizer"
 	_args+=" --disable-multilib"
