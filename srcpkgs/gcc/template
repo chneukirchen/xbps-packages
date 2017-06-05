@@ -4,7 +4,7 @@ _gcjrel=17
 
 pkgname=gcc
 version=${_majorver}.0
-revision=3
+revision=4
 short_desc="The GNU C Compiler"
 maintainer="Juan RP <xtraeme@voidlinux.eu>"
 homepage="http://gcc.gnu.org"
@@ -172,6 +172,8 @@ do_configure() {
 	_args+=" --enable-shared"
 	_args+=" --enable-lto"
 	_args+=" --enable-vtable-verify"
+	_args+=" --enable-default-pie"
+	_args+=" --enable-default-ssp"
 	_args+=" --enable-linker-build-id"
 	_args+=" --enable-serial-configure"
 	_args+=" --disable-werror"
