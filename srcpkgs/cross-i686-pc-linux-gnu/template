@@ -10,8 +10,8 @@ _archflags="-march=i686 -mtune=generic"
 _sysroot="/usr/${_triplet}"
 
 pkgname=cross-${_triplet}
-version=0.23
-revision=2
+version=0.24
+revision=1
 short_desc="GNU Cross toolchain for the ${_triplet} target (binutils/gcc/glibc)"
 maintainer="Juan RP <xtraeme@voidlinux.eu>"
 homepage="http://www.voidlinux.eu"
@@ -229,6 +229,8 @@ _gcc_build() {
 	_args+=" --enable-linker-build-id"
 	_args+=" --enable-gnu-unique-object"
 	_args+=" --enable-lto"
+	_args+=" --enable-default-pie"
+	_args+=" --enable-default-ssp"
 	_args+=" --enable-gnu-indirect-function"
 	_args+=" --enable-libquadmath"
 	_args+=" --disable-libatomic"
