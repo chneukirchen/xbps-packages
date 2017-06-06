@@ -82,6 +82,7 @@ _gcc_bootstrap() {
 
 	cd ${wrksrc}/gcc-${_gcc_version}
 	_apply_patch -p1 ${FILESDIR}/gcc-6.3.0-musl.diff
+	_apply_patch -p1 ${FILESDIR}/gcc-musl-libssp.diff
 	_apply_patch -p0 ${FILESDIR}/libcpp-source_date_epoch.patch
 	_apply_patch -p0 ${FILESDIR}/fix-cxxflags-passing.patch
 
@@ -146,6 +147,10 @@ _musl_build() {
 
 	make ${makejobs}
 	make DESTDIR=${_sysroot} install
+
+	"${_triplet}-gcc" -c -Os ${_archflags} ${FILESDIR}/__stack_chk_fail_local.c -o  __stack_chk_fail_local.o
+	"${_triplet}-ar" r libssp_nonshared.a __stack_chk_fail_local.o
+	cp libssp_nonshared.a ${_sysroot}/usr/lib
 
 	touch ${wrksrc}/.musl_build_done
 }
