@@ -12,7 +12,6 @@ license="GFDL-1.2, GPL-3, LGPL-2.1"
 distfiles="${GNU_SITE}/gcc/gcc-${version}/gcc-${version}.tar.bz2"
 checksum=f06ae7f3f790fbf0f018f6d40e844451e6bc3b7bc96e128e63b09825c1f8b29f
 
-nopie=yes
 lib32disabled=yes
 bootstrap=yes
 
@@ -157,8 +156,9 @@ do_configure() {
 			;;
 	esac
 
-	export CFLAGS="${CFLAGS/-D_FORTIFY_SOURCE=2/}"
-	export CXXFLAGS="${CXXFLAGS/-D_FORTIFY_SOURCE=2/}"
+	export CFLAGS="-fPIE ${CFLAGS/-D_FORTIFY_SOURCE=2/}"
+	export CXXFLAGS="-fPIE ${CXXFLAGS/-D_FORTIFY_SOURCE=2/}"
+	export LDFLAGS="-pie ${LDFLAGS}"
 
 	_args+=" --prefix=/usr"
 	_args+=" --mandir=/usr/share/man"
