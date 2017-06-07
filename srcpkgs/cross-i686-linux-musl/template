@@ -29,7 +29,6 @@ checksum="
 
 lib32disabled=yes
 nocross=yes
-nopie=yes
 nodebug=yes
 create_wrksrc=yes
 hostmakedepends="perl flex"
@@ -66,7 +65,8 @@ _binutils_build() {
 	_args+=" --disable-shared"
 	_args+=" ${_fpuflags}"
 
-	../binutils-${_binutils_version}/configure ${_args}
+	CFLAGS="-O2 -fPIE" CXXFLAGS="-O2 -fPIE" LDFLAGS="-pie" \
+		../binutils-${_binutils_version}/configure ${_args}
 
 	make configure-host
 	make ${makejobs}
@@ -182,7 +182,8 @@ _gcc_build() {
 	_args+=" libat_cv_have_ifunc=no"
 	_args+=" ${_fpuflags}"
 
-	../gcc-${_gcc_version}/configure ${_args}
+	CFLAGS="-O2 -fPIE" CXXFLAGS="-O2 -fPIE" LDFLAGS="-pie" \
+		../gcc-${_gcc_version}/configure ${_args}
 
 	make ${makejobs}
 
